@@ -5,7 +5,12 @@ import 'firebase/database';
 
 
 const config = {
- 
+    apiKey: "AIzaSyA7fsBUxZCYB_CNE_9H8aSgTGxsQi_J8VY",
+    authDomain: "fir-project-8442c.firebaseapp.com",
+    databaseURL: "https://fir-project-8442c.firebaseio.com",
+    projectId: "fir-project-8442c",
+    storageBucket: "fir-project-8442c.appspot.com",
+    messagingSenderId: "609879751698",
 
   };
   class Firebase {

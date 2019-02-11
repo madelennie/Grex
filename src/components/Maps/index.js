@@ -1,12 +1,14 @@
 import React, { Component } from "react";
+import { compose } from "recompose";
 
 import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 
 import { withFirebase } from "../Firebase";
-
+import { withAuthorization,AuthUserContext, withEmailVerification } from "../Session";
 import L from "leaflet";
 import { GeolocatedProps, geolocated } from "react-geolocated";
 import "./map.css";
+import { functions } from "firebase";
 
 
 var myIcon = L.icon({
@@ -15,6 +17,18 @@ var myIcon = L.icon({
   iconAnchor: [12.5, 41],
   popupAnchor: [0, -41]
 });
+
+const MapPage = () => (
+  <div>
+
+    <h1>Home Page</h1>
+    <p>The Home Page is accessible by every signed in user.</p>
+
+    <Locations />
+  </div>
+);
+
+
 
  class LocationMap extends Component  {
 
@@ -31,8 +45,10 @@ var myIcon = L.icon({
     };
   }
 
+
+
   componentDidMount(props) {
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation.watchPosition(
       position => {
         this.setState({
           location: {
@@ -46,30 +62,15 @@ var myIcon = L.icon({
           zoom: 13
         });
       },
-      () => {
-        console.log("No location given");
-        fetch("https://ipapi.co/json")
-          .then(res => res.json())
-          .then(location => {
-            this.props.firebase.locations().on("value", snapshot => {
-              this.setState({
-                location: {
-                  lat: location.latitude,
-                  lng: location.longitude
-                },
-                haverUsersLocation: true,
-                zoom: 13
-              });
-            });
-          });
-      }
+
     );
   }
 
+
   render() {
-    
-    const position = [this.state.location.lat, this.state.location.lng];
+     const position = [this.state.location.lat, this.state.location.lng];
     return (
+
 <div
         style={{
           fontSize: "large",
@@ -113,20 +114,30 @@ var myIcon = L.icon({
         ) : (
           ""
         )}
+
       </Map>
+
       </div>
 
     )}
 
 }
 
+const Locations = withFirebase(LocationMap);
+const condition = authUser => !!authUser;
+export {Locations}
+export default compose(
+  withAuthorization(condition),
 
+  geolocated()
+)(LocationMap,MapPage);
 
-export default geolocated({
+ geolocated({
   positionOptions: {
     enableHighAccuracy: false,
   },
   userDecisionTimeout: 5000,
+  watchPosition: true
 })(LocationMap);
 
 
