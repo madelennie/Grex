@@ -16,15 +16,18 @@
     integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
     crossorigin=""/>
 
-  <!-- Make sure you put this AFTER Leaflet's CSS -->
-  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
-    integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
-    crossorigin=""></script>
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+      integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+      crossorigin=""
+    />
 
     <title>React App</title>
   </head>
   <body>
-      <div id="map"></div>
+
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <!--
@@ -38,17 +41,6 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
     <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase.js"></script>
-<script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyA7fsBUxZCYB_CNE_9H8aSgTGxsQi_J8VY",
-    authDomain: "fir-project-8442c.firebaseapp.com",
-    databaseURL: "https://fir-project-8442c.firebaseio.com",
-    projectId: "fir-project-8442c",
-    storageBucket: "fir-project-8442c.appspot.com",
-    messagingSenderId: "609879751698"
-  };
-  firebase.initializeApp(config);
-</script>
+
   </body>
 </html>

@@ -200,7 +200,7 @@ class DefaultLoginToggle extends Component {
   }
 }
 
-const LoginManagement = withFirebase(LoginManagementBase);
+export  const LoginManagement = withFirebase(LoginManagementBase);
 const condition = authUser => !!authUser;
 
 export default compose(

@@ -97,9 +97,9 @@ const config = {
 
    /// *** GPS LOCATION API *** ///
 
-   location = uid => this.db.ref(`location/${uid}`)
+  //  location = uid => this.db.ref(`location/${uid}`)
 
-   locations = () => this.db.ref('locations')
+  //  locations = () => this.db.ref('locations')
   }
 
   export default Firebase;

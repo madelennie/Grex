@@ -55,7 +55,7 @@ class SignUpFormBase extends Component {
             username,
             email,
             roles,
-            position:{lat:0, lng:0}
+            position: { latitude: "0", longitude: "0" }
           });
       })
       .then(() => {
@@ -106,7 +106,7 @@ class SignUpFormBase extends Component {
           <TextField
           name="username"
           value={username}
-          placeholder="Email Address"
+          placeholder="Username"
           onChange={this.onChange}
        />
 

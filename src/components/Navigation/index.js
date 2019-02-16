@@ -25,7 +25,7 @@ const NavigationAuth = () => (
 
   <ul>
     <li>
-      <Link to={ROUTES.LANDING}>Map</Link>
+      <Link to={ROUTES.MAP}>Map</Link>
     </li>
     <li>
       <Link to={ROUTES.HOME}>Home</Link>
@@ -39,12 +39,6 @@ const NavigationAuth = () => (
     <li>
       <SignOutButton />
     </li>
-    {/* <div style={{width: '10%', height: 100}}>
-    <GoogleMaps
-    style={{height: '50px', width: '50px'}}
-
-    ></GoogleMaps>
-    </div> */}
 
   </ul>
 
@@ -56,7 +50,6 @@ const NavigationNonAuth = () => (
   <MenuLog>
   <ul>
     <li>
-      <Link to={ROUTES.LANDING}>Landing</Link>
     </li>
     <li>
       <Link to={ROUTES.SIGN_IN}>Sign In</Link>
