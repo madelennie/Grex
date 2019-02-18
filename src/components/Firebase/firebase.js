@@ -17,6 +17,7 @@ const config = {
     constructor() {
       app.initializeApp(config);
 
+      this.serverValue = app.database.ServerValue
       this.emailAuthProvider = app.auth.EmailAuthProvider;
       this.auth = app.auth();
       this.db = app.database();
@@ -95,11 +96,11 @@ const config = {
 
    messages = () => this.db.ref('messages')
 
-   /// *** GPS LOCATION API *** ///
+   /// *** Event Starter API *** ///
 
-  //  location = uid => this.db.ref(`location/${uid}`)
+    event = uid => this.db.ref(`event/${uid}`)
 
-  //  locations = () => this.db.ref('locations')
+    events = () => this.db.ref('events')
   }
 
   export default Firebase;

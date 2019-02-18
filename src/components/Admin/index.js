@@ -1,15 +1,22 @@
+//Import Libraries
 import React, { Component } from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch,withRouter, Route, Link } from "react-router-dom";
+
 import { compose } from "recompose";
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 
+import { ReactLeafletSearch } from 'react-leaflet-search'
+import {Map, TileLayer, Popup} from 'react-leaflet'
 
+//Import components
 import { withFirebase } from "../Firebase";
-import { withAuthorization, withEmailVerification } from "../Session";
+import { withAuthorization,AuthUserContext, withEmailVerification } from "../Session";
+
+import { LocationMap } from "../Maps";
+
+//Import from constant folder
 import * as ROLES from "../../constants/roles";
 import * as ROUTES from "../../constants/routes";
 
-import LocationMap from '../Maps/index'
 
 const AdminPage = () => (
   <div>
@@ -20,7 +27,13 @@ const AdminPage = () => (
       <Route exact path={ROUTES.ADMIN_DETAILS} component={UserItem} />
       <Route exact path={ROUTES.ADMIN} component={UserList} />
     </Switch>
+
+    <div>
+      <Events></Events>
+    </div>
+
   </div>
+
 );
 
 class UserListBase extends Component {
@@ -29,7 +42,8 @@ class UserListBase extends Component {
 
     this.state = {
       loading: false,
-      users: []
+      users: [],
+
     };
 
   }
@@ -42,7 +56,8 @@ class UserListBase extends Component {
 
       const usersList = Object.keys(usersObject).map(key => ({
         ...usersObject[key],
-        uid: key
+        uid: key,
+
       }));
 
       this.setState({
@@ -51,13 +66,16 @@ class UserListBase extends Component {
       });
     });
   }
+
+
   componentWillUnmount() {
     this.props.firebase.users().off();
   }
 
   render() {
     const { users, loading } = this.state;
-    const position = [this.state.lat, this.state.lng]
+
+    // const position = [this.state.lat, this.state.lng]
 
     return (
 
@@ -66,7 +84,8 @@ class UserListBase extends Component {
         {loading && <div>Loading ...</div>}
         <ul>
           {users.map(user => (
-            <li key={user.uid}>
+            <li key={user.uid}  >
+
               <span>
                 <strong>ID:</strong> {user.uid}
               </span>
@@ -75,6 +94,11 @@ class UserListBase extends Component {
               </span>
               <span>
                 <strong>Username:</strong> {user.username}
+              </span>
+              <br></br>
+              <span>
+                <strong>Position</strong> {user.position.lat} {user.position.lng}
+                <br></br>
               </span>
               <span>
                 <Link
@@ -130,9 +154,6 @@ class UserItemBase extends Component {
     const { user, loading } = this.state;
 
     return (
-      <LocationMap>
-
-
       <div>
         <h2> User ({this.props.match.params.id})</h2>
         {loading && <div>Loading...</div>}
@@ -160,15 +181,10 @@ Send Password Reset
           </div>
         )}
       </div>
-      </LocationMap>
+
     );
   }
 }
-// const UserItem = ({ match }) => (
-//   <div>
-//     <h2>User ({match.params.id})</h2>
-//   </div>
-// );
 const condition = authUser => authUser && authUser.roles.includes(ROLES.ADMIN);
 
 const UserList = withFirebase(UserListBase);
@@ -178,3 +194,126 @@ export default compose(
   withEmailVerification,
   withAuthorization(condition)
 )(AdminPage);
+
+
+
+
+
+
+class StartEvent extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      name:'',
+      loading: false,
+      events: [],
+      latitude: '',
+      longitude: ''
+    }
+  }
+
+  componentDidMount() {
+    this.setState({loading:true})
+
+    this.props.firebase.events().on('value', snapshot => {
+      const eventObject = snapshot.val()
+
+      if (eventObject) {
+        const eventList = Object.keys(eventObject).map(key => ({
+          ...eventObject[key],
+          uid:key,
+        }))
+        //Convert event list from snapshot..do i really want a list though?
+        this.setState({
+          events: eventList,
+          loading:false,
+
+        })
+      } else {
+        this.setState({events:null, loading:false})
+      }
+    })
+  }
+  // componentWillMount () {
+  //   this.props.firebase.events().off
+  //   }
+  onChangeText = event => {
+
+    this.setState({ [event.target.name]: event.target.value })
+  }
+
+  handleClick = event => {
+    const { lat, lng } = event.latlng
+    console.log(`Clicked at ${lat}, ${lng}`)
+    this.setState({  latitude: lat, longitude: lng });
+
+  }
+
+  onCreateEvent =(event, authUser)  => {
+    this.props.firebase.events().push({
+      name:this.state.name,
+      userId:authUser.uid,
+      latitude:this.state.latitude,
+      longitude:this.state.longitude
+
+    })
+    this.setState({name: ''})
+
+    event.preventDefault()
+  }
+  render() {
+    const {name, events, loading} = this.state
+
+  return (
+
+       <AuthUserContext.Consumer>
+        {authUser => (
+          <div>
+          <h2>Event</h2>
+          {loading && <div> Loading... </div>}
+          <LocationMap userId={authUser.uid} firebase={this.props.firebase} handleClick={this.handleClick}/>
+          {events ? (
+            <EventList events={events} />
+    
+          ) : (
+              <div> There no active events</div>
+          )}
+    
+          <form onSubmit={event => this.onCreateEvent(event,authUser)}>
+              <input
+              type="text"
+              name="name"
+              value={name}
+              onChange={this.onChangeText}
+              />
+              <button type="submit">Create Event</button>
+          </form>
+        </div>
+        )}
+        </AuthUserContext.Consumer>
+
+  )
+  }
+}
+const EventList = ({events}) => (
+  <ul>
+    {events.map(event => (
+      <EventItem key={event.uid} event={event} />
+    ))}
+  </ul>
+)
+// const EventForm = compose(withRouter, withFirebase,)(StartEvent);
+
+const EventItem = ({event}) => (
+  <li>
+    <strong>{event.name}</strong> <br />
+    <strong>Latitude  : {event.latitude}</strong> <br />
+    <strong>Longitude : {event.longitude}</strong>
+  </li>
+)
+
+const Events = withFirebase(StartEvent)
+
+
+

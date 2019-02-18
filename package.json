@@ -9,6 +9,7 @@
     "install": "^0.12.2",
     "leaflet": "^1.4.0",
     "leaflet-realtime": "^2.1.1",
+    "leaflet-search": "^2.9.8",
     "link": "^0.1.5",
     "material-ui": "^0.20.2",
     "npm": "^6.7.0",
@@ -16,6 +17,7 @@
     "react-dom": "^16.7.0",
     "react-geolocated": "^2.4.1",
     "react-leaflet": "^2.2.0",
+    "react-leaflet-search": "^0.6.0",
     "react-native": "^0.58.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.2",
@@ -38,6 +40,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "eslint-plugin-react": "^7.12.4"
   }
 }

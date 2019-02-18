@@ -10,6 +10,7 @@ import "./map.css";
 
 import {  geolocated } from "react-geolocated";
 
+
 var myIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png",
   iconSize: [25, 41],
@@ -17,19 +18,20 @@ var myIcon = L.icon({
   popupAnchor: [0, -41]
 });
 
-class LocationMap extends Component {
+export  class LocationMap extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
-      dbCoords: null,
-
-
-
+      clickedCoords: null,
+      dbCoords: null
     }
 
   }
-
+  // handleClick = event => {
+  //   const { lat, lng } = event.latlng
+  //   console.log(`Clicked at ${lat}, ${lng}`)
+  //   this.setState({ clickedCoords: { lat: lat, lng: lng }});
+  // }
   calculateDistance = (lat1, lon1, lat2, lon2) => {
     var R = 6371; // km (change this constant to get miles)
     var dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -48,7 +50,7 @@ class LocationMap extends Component {
 
   updatePosition = position => {
     console.log('FIRST3')
-    this.setState({ 
+    this.setState({
       dbCoords: {
       latitude: position.coords.latitude,
         longitude: position.coords.longitude
@@ -64,7 +66,11 @@ class LocationMap extends Component {
 
     }
   };
-
+  handleLocalClick = event => {
+    if (this.props.handleClick) {
+    this.props.handleClick(event);
+  }
+  }
   getUserPositionFromDB = () => {
     console.log('FIRST2')
     this.props.firebase
@@ -72,7 +78,7 @@ class LocationMap extends Component {
       .child("position")
       .on("value", snapshot => {
         const userPosition = snapshot.val();
-        console.log('teabody',userPosition);
+        console.log('userposition',userPosition);
         this.setState({ dbCoords: userPosition });
       });
   };
@@ -116,18 +122,19 @@ class LocationMap extends Component {
 
 
     const markers = [
-      { latitude: 59.316607, longitude: 18.034689 },
-      { latitude: 59.307496, longitude: 17.985272 },
-      { latitude: 59.305496, longitude: 17.985272 }
+
     ];
     markers.push(this.state.dbCoords)
+    // if (this.state.clickedCoords) {
+    //   markers.push(this.state.clickedCoords);
+    // }
    return (
 
 
       <div>
         {this.state.dbCoords ? (
 
-          <MyMap
+          <MyMap handleClick={this.handleLocalClick}
           markers={markers}
             position={Object.values(this.state.dbCoords)}
             icon={myIcon}
@@ -148,25 +155,13 @@ class LocationMap extends Component {
   }
 }
 
-  // render() {
-  //   return (
-  //     <div>
-  //       <div>Geolocation</div>
-  //       <div>
-  //         <p>Coords from Browser</p>
-  //         <Coords position={this.state.browserCoords} />
-  //         <p>Coords from DB</p>
-  //         <Coords position={this.state.dbCoords} />
-  //       </div>
-  //     </div>
-  //   );
-  // }
   const MyMap = props => (
     <Map
       zoomControl={false}
       scrollWheelZoom={false}
       center={props.position}
       zoom={props.zoom}
+      onClick={props.handleClick}
     >
       <TileLayer
       attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
