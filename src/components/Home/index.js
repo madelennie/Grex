@@ -208,18 +208,18 @@ class MessageItem extends Component {
 
     return (
       <li>
-        {editMode ? (
+        {/* {editMode ? (
           <input
             type="text"
             value={editText}
             onChange={this.onChangeEditText}
           />
         ) : (
-          <span>
-            <strong>{message.user.username || message.user.userId}</strong>{" "}
-            {message.text} {message.editedAt && <span>(Edited)</span>}
-          </span>
-        )}
+          // <span>
+          //   <strong>{message.user.username || message.user.userId}</strong>{" "}
+          //   {message.text} {message.editedAt && <span>(Edited)</span>}
+          // </span>
+        )} */}
 
         {editMode ? (
           <span>

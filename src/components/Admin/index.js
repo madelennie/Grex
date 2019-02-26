@@ -5,20 +5,24 @@ import { Switch,withRouter, Route, Link } from "react-router-dom";
 import { compose } from "recompose";
 
 import { ReactLeafletSearch } from 'react-leaflet-search'
-import {Map, TileLayer, Popup} from 'react-leaflet'
+import { Map, TileLayer, Marker, Popup } from "react-leaflet";
 
 //Import components
 import { withFirebase } from "../Firebase";
 import { withAuthorization,AuthUserContext, withEmailVerification } from "../Session";
+import {SVGIconComponent} from './iconComponent'
+import ReactDOMServer from 'react-dom/server';
+
 
 import { LocationMap } from "../Maps";
+import L from "leaflet";
 
 //Import from constant folder
 import * as ROLES from "../../constants/roles";
 import * as ROUTES from "../../constants/routes";
 
 
-const AdminPage = () => (
+const AdminPage = (props) => (
   <div>
     <h1>Admin</h1>
     <p>The Admin page is accessible by every signed in admin user.</p>
@@ -29,7 +33,7 @@ const AdminPage = () => (
     </Switch>
 
     <div>
-      <Events></Events>
+      <Events icon={props.LocationIcon} handleClick={props.handleClick}></Events>
     </div>
 
   </div>
@@ -96,10 +100,10 @@ class UserListBase extends Component {
                 <strong>Username:</strong> {user.username}
               </span>
               <br></br>
-              <span>
+              {/* <span>
                 <strong>Position</strong> {user.position.lat} {user.position.lng}
                 <br></br>
-              </span>
+              </span> */}
               <span>
                 <Link
                   to={{
@@ -192,10 +196,9 @@ const UserItem = withFirebase(UserItemBase);
 
 export default compose(
   withEmailVerification,
+
   withAuthorization(condition)
 )(AdminPage);
-
-
 
 
 
@@ -211,8 +214,8 @@ class StartEvent extends Component {
       latitude: '',
       longitude: ''
     }
-  }
 
+  }
   componentDidMount() {
     this.setState({loading:true})
 
@@ -224,6 +227,7 @@ class StartEvent extends Component {
           ...eventObject[key],
           uid:key,
         }))
+        // console.log('eventObject',eventObject)
         //Convert event list from snapshot..do i really want a list though?
         this.setState({
           events: eventList,
@@ -243,26 +247,46 @@ class StartEvent extends Component {
     this.setState({ [event.target.name]: event.target.value })
   }
 
-  handleClick = event => {
+   handleClick = event => {
     const { lat, lng } = event.latlng
-    console.log(`Clicked at ${lat}, ${lng}`)
+    
+    console.log(`Clicked at -> ${lat}, ${lng}`)
     this.setState({  latitude: lat, longitude: lng });
 
   }
 
-  onCreateEvent =(event, authUser)  => {
+  onCreateEvent =(event, authUser,events)  => {
+    console.log('eventlist', this.state.events)
     this.props.firebase.events().push({
       name:this.state.name,
       userId:authUser.uid,
       latitude:this.state.latitude,
-      longitude:this.state.longitude
+      longitude:this.state.longitude,
 
     })
     this.setState({name: ''})
 
+
     event.preventDefault()
   }
+
+      inviteEvent = (event,authUser) => {
+        const eventKey = this.props.firebase.user(this.state.authUser.uid).push().key;
+    
+        this.props.firebase
+            .user(this.state.authUser.uid)
+            .child(eventKey)
+            .set({
+              invEvent: this.state.events
+            });
+
+   }
+   
+
   render() {
+
+
+
     const {name, events, loading} = this.state
 
   return (
@@ -270,16 +294,20 @@ class StartEvent extends Component {
        <AuthUserContext.Consumer>
         {authUser => (
           <div>
+
+          />
           <h2>Event</h2>
           {loading && <div> Loading... </div>}
-          <LocationMap userId={authUser.uid} firebase={this.props.firebase} handleClick={this.handleClick}/>
+          <LocationMap userId={authUser.uid}
+
+  firebase={this.props.firebase} handleClick={this.handleClick} />
           {events ? (
             <EventList events={events} />
     
           ) : (
               <div> There no active events</div>
           )}
-    
+
           <form onSubmit={event => this.onCreateEvent(event,authUser)}>
               <input
               type="text"
@@ -289,6 +317,11 @@ class StartEvent extends Component {
               />
               <button type="submit">Create Event</button>
           </form>
+          <form onSubmit={event => this.inviteEvent(event)}>
+
+              <button type="submit">Send invite Event</button>
+          </form>
+
         </div>
         )}
         </AuthUserContext.Consumer>
@@ -314,6 +347,4 @@ const EventItem = ({event}) => (
 )
 
 const Events = withFirebase(StartEvent)
-
-
 
